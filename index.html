@@ -1,0 +1,821 @@
+<title>PdP CoolClub</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">
+
+<style>
+:root {
+  --bg: #F5F5F0;
+  --surface: #FFFFFF;
+  --surface2: #EEEEE8;
+  --border: #D0D0C8;
+  --text: #1A1A2E;
+  --text2: #555566;
+  --teal: #2ABFAA;
+  --teal-dim: #1E8F7E;
+  --yellow: #FFC947;
+  --red: #E05555;
+  --header-bg: #1A1A2E;
+  --header-text: #F5F5F0;
+  --slot-hover: #E8F8F6;
+  --slot-active: #C8F0EA;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12121F; --surface: #1E1E30; --surface2: #252538;
+    --border: #3A3A50; --text: #F0F0EA; --text2: #9090A8;
+    --slot-hover: #1A3030; --slot-active: #1A3A35; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12121F; --surface: #1E1E30; --surface2: #252538;
+  --border: #3A3A50; --text: #F0F0EA; --text2: #9090A8;
+  --slot-hover: #1A3030; --slot-active: #1A3A35; color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100%; padding-inline: 0; }
+
+/* HEADER */
+.app-header {
+  background: var(--header-bg); padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 100;
+}
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; color: var(--teal); letter-spacing: 2px; }
+.header-right { display: flex; gap: 8px; align-items: center; }
+
+.btn {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600;
+  letter-spacing: 1px; padding: 7px 16px; border: none; border-radius: 4px; cursor: pointer; transition: opacity .15s;
+}
+.btn:hover { opacity: .85; }
+.btn-teal { background: var(--teal); color: #1A1A2E; }
+.btn-outline { background: transparent; color: var(--teal); border: 1.5px solid var(--teal); }
+.btn-sm { font-size: 13px; padding: 5px 11px; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); font-size: 12px; padding: 4px 10px; }
+
+/* META BAR */
+.meta-bar {
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  padding: 12px 20px; display: flex; flex-wrap: wrap; gap: 12px;
+}
+.meta-field { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 140px; }
+.meta-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text2); }
+.meta-input {
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  padding: 6px 10px; border-radius: 4px; outline: none; width: 100%;
+}
+.meta-input:focus { border-color: var(--teal); }
+
+/* CREW SECTION */
+.crew-section {
+  background: var(--surface); border-bottom: 2px solid var(--teal);
+  padding: 16px 20px;
+}
+.crew-section-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+}
+.crew-section-title {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+}
+.crew-table { width: 100%; border-collapse: collapse; }
+.crew-table th {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text2);
+  padding: 4px 8px; text-align: left; border-bottom: 1px solid var(--border);
+}
+.crew-table td { padding: 3px 4px; border-bottom: 1px solid var(--border); }
+.crew-input {
+  font-family: 'Inter', sans-serif; font-size: 12px;
+  background: transparent; border: none; color: var(--text);
+  padding: 4px 6px; outline: none; width: 100%; border-radius: 3px;
+}
+.crew-input:focus { background: var(--slot-hover); }
+.crew-del { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 3px; }
+.crew-del:hover { color: var(--red); background: rgba(224,85,85,.1); }
+
+/* AUTOCOMPLETE */
+.autocomplete-wrap { position: relative; }
+.autocomplete-list {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 300;
+  background: var(--surface); border: 1px solid var(--teal); border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15); max-height: 160px; overflow-y: auto;
+}
+.autocomplete-item {
+  padding: 7px 10px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif;
+  border-bottom: 1px solid var(--border); color: var(--text);
+  display: flex; flex-direction: column; gap: 1px;
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: var(--slot-hover); }
+.autocomplete-sub { font-size: 10px; color: var(--text2); }
+
+/* TIPO CUSTOM MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 400;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--surface); border-radius: 8px; padding: 24px; width: 320px; max-width: 90vw;
+  border-top: 3px solid var(--teal);
+}
+.modal-title { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text); margin-bottom: 16px; }
+.modal-input {
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  padding: 8px 10px; border-radius: 4px; outline: none; width: 100%; margin-bottom: 12px;
+}
+.modal-input:focus { border-color: var(--teal); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* LEGEND */
+.legend {
+  padding: 10px 20px; display: flex; gap: 12px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border); background: var(--surface2); align-items: center;
+}
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); font-family: 'Barlow Condensed', sans-serif; letter-spacing: .5px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-add { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--teal); cursor: pointer; padding: 2px 8px; border: 1px dashed var(--teal); border-radius: 3px; margin-left: 4px; }
+.legend-add:hover { background: rgba(42,191,170,.1); }
+
+/* MAIN LAYOUT */
+.main { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+@media (max-width: 700px) { .main { grid-template-columns: 1fr; } }
+
+.section { border-right: 1px solid var(--border); min-height: 60vh; }
+.section:last-child { border-right: none; }
+
+.section-header {
+  background: var(--header-bg); padding: 10px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 52px); z-index: 50;
+}
+.section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--header-text); }
+.section-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; color: var(--teal); background: rgba(42,191,170,0.15); padding: 2px 8px; border-radius: 3px; }
+
+/* SLOT */
+.slot-list { padding: 8px 0 32px; }
+.slot {
+  display: grid; grid-template-columns: 52px 1fr;
+  border-bottom: 1px solid var(--border); min-height: 38px; transition: background .1s;
+}
+.slot:hover { background: var(--slot-hover); }
+.slot.has-value { background: var(--slot-active); }
+
+.slot-time {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600;
+  font-variant-numeric: tabular-nums; color: var(--text2);
+  padding: 9px 6px 9px 14px; white-space: nowrap; user-select: none; align-self: center; letter-spacing: .5px;
+}
+.slot.has-value .slot-time { color: var(--teal); }
+
+.slot-content {
+  display: grid; grid-template-columns: 120px 1fr 100px;
+  border-left: 1px solid var(--border);
+}
+
+.slot-type {
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  border: none; border-right: 1px solid var(--border);
+  background: transparent; color: var(--text);
+  padding: 0 6px; cursor: pointer; outline: none;
+  appearance: none; -webkit-appearance: none;
+}
+.slot-type:focus { background: var(--slot-hover); }
+
+.slot-note {
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  border: none; background: transparent; color: var(--text);
+  padding: 0 8px; outline: none; width: 100%;
+}
+.slot-note::placeholder { color: var(--border); }
+.slot-note:focus { background: var(--slot-hover); }
+
+.slot-crew {
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  border: none; border-left: 1px solid var(--border);
+  background: transparent; color: var(--text2);
+  padding: 0 6px; outline: none; width: 100%; font-style: italic;
+}
+.slot-crew::placeholder { color: var(--border); font-style: normal; }
+.slot-crew:focus { background: var(--slot-hover); color: var(--text); font-style: normal; }
+
+/* EXPORT */
+.export-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.7); z-index: 200; overflow-y: auto; padding: 24px 16px;
+}
+.export-sheet {
+  background: #FFFFFF; color: #1A1A2E; max-width: 800px;
+  margin: 0 auto; border-radius: 4px; overflow: hidden; font-family: 'Inter', sans-serif;
+}
+.export-header { background: #1A1A2E; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; }
+.export-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700; color: #2ABFAA; letter-spacing: 3px; }
+.export-event-name { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: #FFFFFF; letter-spacing: 1px; text-align: right; }
+.export-meta { background: #F0F0EA; padding: 10px 28px; display: flex; gap: 32px; flex-wrap: wrap; border-bottom: 2px solid #2ABFAA; }
+.export-meta-item { display: flex; flex-direction: column; gap: 1px; }
+.export-meta-label { font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #888888; }
+.export-meta-value { font-size: 13px; font-weight: 600; color: #1A1A2E; }
+
+.export-crew { padding: 14px 28px 0; }
+.export-crew-title {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: #1A1A2E;
+  background: #2ABFAA; padding: 5px 12px; display: inline-block; margin-bottom: 8px;
+}
+.export-crew-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; }
+.export-crew-table th { font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #888; padding: 4px 8px; border-bottom: 1px solid #DDD; text-align: left; }
+.export-crew-table td { padding: 5px 8px; border-bottom: 1px solid #EEE; color: #1A1A2E; }
+.export-crew-table tr:nth-child(even) td { background: #F8F8F4; }
+
+.export-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.export-section { padding: 0 0 20px; border-right: 1px solid #E0E0D8; }
+.export-section:last-child { border-right: none; }
+.export-section-title {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; background: #2ABFAA; color: #1A1A2E; padding: 7px 20px; margin-bottom: 4px;
+}
+.export-row { display: grid; grid-template-columns: 48px 90px 1fr 80px; border-bottom: 1px solid #E8E8E0; min-height: 30px; align-items: center; }
+.export-row:nth-child(even) { background: #F8F8F4; }
+.export-time { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: #2ABFAA; padding: 5px 6px 5px 16px; }
+.export-type { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; padding: 5px 6px; border-left: 1px solid #E8E8E0; }
+.export-note { font-size: 11px; color: #444456; padding: 5px 8px 5px 6px; border-left: 1px solid #E8E8E0; }
+.export-crew-col { font-size: 10px; color: #777; padding: 5px 8px 5px 6px; border-left: 1px solid #E8E8E0; font-style: italic; }
+
+.export-footer { background: #1A1A2E; padding: 10px 28px; font-size: 10px; color: #888888; letter-spacing: .5px; display: flex; justify-content: space-between; }
+.export-actions { display: flex; gap: 8px; padding: 16px 0 0; justify-content: center; flex-wrap: wrap; }
+</style>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="logo-text">COOL CLUB</div>
+  <div class="header-right">
+    <button class="btn btn-outline btn-sm" onclick="resetAll()">Azzera</button>
+    <button class="btn btn-teal" onclick="showExport()">Genera PdP →</button>
+  </div>
+</header>
+
+<!-- META BAR -->
+<div class="meta-bar">
+  <div class="meta-field">
+    <span class="meta-label">Evento</span>
+    <input class="meta-input" id="m-evento" placeholder="Nome evento" />
+  </div>
+  <div class="meta-field" style="max-width:150px">
+    <span class="meta-label">Data</span>
+    <input class="meta-input" id="m-data" type="date" />
+  </div>
+  <div class="meta-field">
+    <span class="meta-label">Location</span>
+    <input class="meta-input" id="m-location" placeholder="Venue / Indirizzo" />
+  </div>
+</div>
+
+<!-- CREW TECNICA -->
+<div class="crew-section">
+  <div class="crew-section-header">
+    <span class="crew-section-title">◼ Crew Tecnica</span>
+    <button class="btn btn-ghost" onclick="addCrewRow()">+ Aggiungi</button>
+  </div>
+  <table class="crew-table">
+    <thead>
+      <tr>
+        <th style="width:22%">Nome</th>
+        <th style="width:20%">Ruolo</th>
+        <th style="width:22%">Telefono</th>
+        <th style="width:28%">Email</th>
+        <th style="width:8%"></th>
+      </tr>
+    </thead>
+    <tbody id="crew-body"></tbody>
+  </table>
+</div>
+
+<!-- LEGEND -->
+<div class="legend" id="legend-bar">
+  <!-- populated by JS -->
+  <span class="legend-add" onclick="openAddType()">+ Aggiungi tipo</span>
+</div>
+
+<!-- MAIN GRID -->
+<div class="main">
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">◼ Pre Show</span>
+      <span class="section-badge" id="badge-pre">0 attività</span>
+    </div>
+    <div class="slot-list" id="slots-pre"></div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">◼ Show</span>
+      <span class="section-badge" id="badge-show">0 attività</span>
+    </div>
+    <div class="slot-list" id="slots-show"></div>
+  </div>
+</div>
+
+<!-- EXPORT OVERLAY -->
+<div class="export-overlay" id="export-overlay">
+  <div class="export-sheet" id="export-sheet">
+    <div class="export-header">
+      <div class="export-logo">COOL<br>CLUB</div>
+      <div class="export-event-name" id="ex-title">—</div>
+    </div>
+    <div class="export-meta" id="ex-meta"></div>
+    <div class="export-crew" id="ex-crew"></div>
+    <div class="export-body" id="ex-body"></div>
+    <div class="export-footer">
+      <span id="ex-footer-dt"></span>
+      <span></span>
+    </div>
+  </div>
+  <div class="export-actions">
+    <button class="btn btn-outline" onclick="closeExport()">← Chiudi</button>
+    <button class="btn btn-teal" onclick="copyText()">Copia testo</button>
+    <button class="btn btn-teal" onclick="printExport()">Stampa / Salva PDF</button>
+  </div>
+</div>
+
+<!-- MODAL AGGIUNGI TIPO -->
+<div class="modal-overlay" id="modal-tipo">
+  <div class="modal-box">
+    <div class="modal-title">Nuovo tipo attività</div>
+    <input class="modal-input" id="modal-tipo-input" placeholder="es. Intervallo, Doppio palco..." maxlength="32" />
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeAddType()">Annulla</button>
+      <button class="btn btn-teal btn-sm" onclick="confirmAddType()">Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONTACTS AUTOCOMPLETE ──
+const KNOWN_CREW = [
+  { nome: 'Alessio Leo', ruolo: 'Responsabile Tecnico', tel: '3663312432', email: 'alessio@coolclub.it' },
+  { nome: 'Cesare Liaci', ruolo: 'Direttore di Produzione', tel: '3404649571', email: 'cesare@coolclub.it' },
+  { nome: 'Veronica Clarizio', ruolo: 'Ospitalità / Logistica', tel: '3208190177', email: 'veronica@coolclub.it' },
+];
+
+// ── TYPES ──
+const BASE_TYPES = [
+  { value: '', label: '— nessuna —', color: null },
+  { value: 'load-in', label: 'Load-in', color: '#2ABFAA' },
+  { value: 'soundcheck', label: 'Soundcheck', color: '#FFC947' },
+  { value: 'show', label: 'Show', color: '#E05555' },
+  { value: 'cambio', label: 'Cambio palco', color: '#8888FF' },
+  { value: 'montaggio', label: 'Montaggio', color: '#5599FF' },
+  { value: 'smontaggio', label: 'Smontaggio', color: '#FF7744' },
+  { value: 'pausa', label: 'Pausa', color: '#AAAAAA' },
+  { value: 'altro', label: 'Altro', color: '#888888' },
+];
+
+let customTypes = [];
+
+function getAllTypes() { return [...BASE_TYPES, ...customTypes]; }
+
+function getTypeObj(value) { return getAllTypes().find(t => t.value === value) || null; }
+
+function randomColor() {
+  const hue = Math.floor(Math.random() * 360);
+  return `hsl(${hue},60%,55%)`;
+}
+
+function saveCustomTypes() {
+  try { localStorage.setItem('pdp-custom-types', JSON.stringify(customTypes)); } catch(e) {}
+}
+function loadCustomTypes() {
+  try {
+    const raw = localStorage.getItem('pdp-custom-types');
+    if (raw) customTypes = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function buildLegend() {
+  const bar = document.getElementById('legend-bar');
+  // remove old items, keep the add button
+  bar.querySelectorAll('.legend-item').forEach(el => el.remove());
+  const addBtn = bar.querySelector('.legend-add');
+  getAllTypes().filter(t => t.color).forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'legend-item';
+    div.innerHTML = `<div class="legend-dot" style="background:${t.color}"></div>${t.label}`;
+    bar.insertBefore(div, addBtn);
+  });
+}
+
+// ── ADD TYPE MODAL ──
+function openAddType() {
+  document.getElementById('modal-tipo').classList.add('open');
+  document.getElementById('modal-tipo-input').value = '';
+  setTimeout(() => document.getElementById('modal-tipo-input').focus(), 50);
+}
+function closeAddType() { document.getElementById('modal-tipo').classList.remove('open'); }
+function confirmAddType() {
+  const label = document.getElementById('modal-tipo-input').value.trim();
+  if (!label) return;
+  const value = 'custom-' + Date.now();
+  const color = randomColor();
+  customTypes.push({ value, label, color });
+  saveCustomTypes();
+  rebuildAllSelects();
+  buildLegend();
+  closeAddType();
+}
+document.getElementById('modal-tipo-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmAddType();
+  if (e.key === 'Escape') closeAddType();
+});
+
+function buildSelectOptions() {
+  return getAllTypes().map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+}
+
+function rebuildAllSelects() {
+  document.querySelectorAll('.slot-type').forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = buildSelectOptions();
+    sel.value = cur;
+  });
+}
+
+// ── TIMES ──
+function generateTimes() {
+  const times = [];
+  for (let h = 8; h < 24; h++)
+    for (let m = 0; m < 60; m += 5)
+      times.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+  for (let h = 0; h <= 4; h++)
+    for (let m = 0; m < 60; m += 5) {
+      if (h === 4 && m > 0) break;
+      times.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    }
+  return times;
+}
+const TIMES = generateTimes();
+function getPreTimes() { return TIMES.filter(t => { const h = parseInt(t); return h >= 8 && h <= 21; }); }
+function getShowTimes() { return TIMES.filter(t => { const h = parseInt(t); return h >= 17 || h <= 4; }); }
+
+// ── CREW ──
+let crewRows = [];
+let crewIdCounter = 0;
+
+function showAutocomplete(id, query) {
+  removeAutocomplete(id);
+  if (!query || query.length < 1) return;
+  const matches = KNOWN_CREW.filter(c =>
+    c.nome.toLowerCase().includes(query.toLowerCase()) ||
+    c.ruolo.toLowerCase().includes(query.toLowerCase())
+  );
+  if (!matches.length) return;
+  const wrap = document.getElementById(`crew-nome-wrap-${id}`);
+  const list = document.createElement('div');
+  list.className = 'autocomplete-list';
+  list.id = `autocomplete-${id}`;
+  matches.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'autocomplete-item';
+    item.innerHTML = `<span>${c.nome}</span><span class="autocomplete-sub">${c.ruolo} · ${c.tel}</span>`;
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      document.getElementById(`crew-nome-${id}`).value = c.nome;
+      document.getElementById(`crew-ruolo-${id}`).value = c.ruolo;
+      document.getElementById(`crew-tel-${id}`).value = c.tel;
+      document.getElementById(`crew-email-${id}`).value = c.email;
+      removeAutocomplete(id);
+      saveState();
+    });
+    list.appendChild(item);
+  });
+  wrap.appendChild(list);
+}
+
+function removeAutocomplete(id) {
+  document.getElementById(`autocomplete-${id}`)?.remove();
+}
+
+function addCrewRow(data = {}) {
+  const id = ++crewIdCounter;
+  crewRows.push(id);
+  const tbody = document.getElementById('crew-body');
+  const tr = document.createElement('tr');
+  tr.id = `crew-row-${id}`;
+  tr.innerHTML = `
+    <td class="autocomplete-wrap" id="crew-nome-wrap-${id}">
+      <input class="crew-input" id="crew-nome-${id}" placeholder="Nome Cognome" value="${data.nome||''}"
+        oninput="showAutocomplete(${id},this.value);saveState()"
+        onblur="setTimeout(()=>removeAutocomplete(${id}),200)" />
+    </td>
+    <td><input class="crew-input" id="crew-ruolo-${id}" placeholder="Ruolo" value="${data.ruolo||''}" oninput="saveState()"/></td>
+    <td><input class="crew-input" id="crew-tel-${id}" placeholder="+39 000 0000000" value="${data.tel||''}" oninput="saveState()"/></td>
+    <td><input class="crew-input" id="crew-email-${id}" placeholder="email@dominio.com" value="${data.email||''}" oninput="saveState()"/></td>
+    <td><button class="crew-del" onclick="removeCrewRow(${id})">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+  saveState();
+}
+
+function removeCrewRow(id) {
+  document.getElementById(`crew-row-${id}`)?.remove();
+  crewRows = crewRows.filter(r => r !== id);
+  saveState();
+}
+
+function getCrewData() {
+  return crewRows
+    .filter(id => document.getElementById(`crew-row-${id}`))
+    .map(id => ({
+      nome: document.getElementById(`crew-nome-${id}`)?.value || '',
+      ruolo: document.getElementById(`crew-ruolo-${id}`)?.value || '',
+      tel: document.getElementById(`crew-tel-${id}`)?.value || '',
+      email: document.getElementById(`crew-email-${id}`)?.value || '',
+    }))
+    .filter(r => r.nome || r.ruolo);
+}
+
+// ── SLOTS ──
+function buildSlots(containerId, times, prefix) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  times.forEach(time => {
+    const id = `${prefix}-${time.replace(':','')}`;
+    const div = document.createElement('div');
+    div.className = 'slot';
+    div.id = `slot-${id}`;
+    div.innerHTML = `
+      <div class="slot-time">${time}</div>
+      <div class="slot-content">
+        <select class="slot-type" id="type-${id}" onchange="onSlotChange('${id}','${prefix}')">
+          ${buildSelectOptions()}
+        </select>
+        <input class="slot-note" id="note-${id}" type="text" placeholder="attività..."
+          oninput="onSlotChange('${id}','${prefix}')" />
+        <input class="slot-crew" id="crew-${id}" type="text" placeholder="chi..."
+          oninput="onSlotChange('${id}','${prefix}')" />
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function getSlotColor(typeValue) {
+  const t = getTypeObj(typeValue);
+  return t?.color || null;
+}
+
+function onSlotChange(id, prefix) {
+  const type = document.getElementById(`type-${id}`).value;
+  const note = document.getElementById(`note-${id}`).value.trim();
+  const crew = document.getElementById(`crew-${id}`).value.trim();
+  const slotEl = document.getElementById(`slot-${id}`);
+  const hasVal = type || note || crew;
+  slotEl.className = 'slot' + (hasVal ? ' has-value' : '');
+  // apply left border color from type
+  const color = getSlotColor(type);
+  slotEl.style.borderLeft = color ? `3px solid ${color}` : '';
+  if (hasVal && type) slotEl.style.borderLeft = `3px solid ${color || '#888'}`;
+  updateBadge(prefix);
+  saveState();
+}
+
+function updateBadge(prefix) {
+  const times = prefix === 'pre' ? getPreTimes() : getShowTimes();
+  let count = 0;
+  times.forEach(t => {
+    const id = `${prefix}-${t.replace(':','')}`;
+    const tv = document.getElementById(`type-${id}`)?.value;
+    const nv = document.getElementById(`note-${id}`)?.value?.trim();
+    const cv = document.getElementById(`crew-${id}`)?.value?.trim();
+    if (tv||nv||cv) count++;
+  });
+  document.getElementById(`badge-${prefix}`).textContent = `${count} attività`;
+}
+
+// ── STATE ──
+function saveState() {
+  try {
+    const slots = {};
+    [...getPreTimes().map(t=>({t,p:'pre'})),...getShowTimes().map(t=>({t,p:'show'}))].forEach(({t,p})=>{
+      const id=`${p}-${t.replace(':','')}`;
+      slots[id]={
+        type: document.getElementById(`type-${id}`)?.value||'',
+        note: document.getElementById(`note-${id}`)?.value||'',
+        crew: document.getElementById(`crew-${id}`)?.value||'',
+      };
+    });
+    const data = {
+      meta: {
+        evento: document.getElementById('m-evento').value,
+        data: document.getElementById('m-data').value,
+        location: document.getElementById('m-location').value,
+      },
+      crew: crewRows.filter(id=>document.getElementById(`crew-row-${id}`)).map(id=>({
+        nome: document.getElementById(`crew-nome-${id}`)?.value||'',
+        ruolo: document.getElementById(`crew-ruolo-${id}`)?.value||'',
+        tel: document.getElementById(`crew-tel-${id}`)?.value||'',
+        email: document.getElementById(`crew-email-${id}`)?.value||'',
+      })),
+      slots
+    };
+    localStorage.setItem('pdp-coolclub', JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('pdp-coolclub');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data.meta) {
+      document.getElementById('m-evento').value = data.meta.evento||'';
+      document.getElementById('m-data').value = data.meta.data||'';
+      document.getElementById('m-location').value = data.meta.location||'';
+    }
+    if (data.crew?.length) {
+      data.crew.forEach(r => addCrewRow(r));
+    }
+    if (data.slots) {
+      Object.entries(data.slots).forEach(([id,val])=>{
+        const te=document.getElementById(`type-${id}`);
+        const ne=document.getElementById(`note-${id}`);
+        const ce=document.getElementById(`crew-${id}`);
+        if(te) te.value=val.type||'';
+        if(ne) ne.value=val.note||'';
+        if(ce) ce.value=val.crew||'';
+        if(val.type||val.note||val.crew){
+          const prefix=id.startsWith('pre-')?'pre':'show';
+          onSlotChange(id,prefix);
+        }
+      });
+    }
+    updateBadge('pre'); updateBadge('show');
+  } catch(e) {}
+}
+
+function resetAll() {
+  if(!confirm('Azzerare tutti i dati?')) return;
+  try { localStorage.removeItem('pdp-coolclub'); } catch(e) {}
+  document.getElementById('m-evento').value='';
+  document.getElementById('m-data').value='';
+  document.getElementById('m-location').value='';
+  document.getElementById('crew-body').innerHTML='';
+  crewRows=[]; crewIdCounter=0;
+  [...getPreTimes().map(t=>({t,p:'pre'})),...getShowTimes().map(t=>({t,p:'show'}))].forEach(({t,p})=>{
+    const id=`${p}-${t.replace(':','')}`;
+    ['type-','note-','crew-'].forEach(pfx=>{
+      const el=document.getElementById(`${pfx}${id}`);
+      if(el) el.value='';
+    });
+    const sl=document.getElementById(`slot-${id}`);
+    if(sl){ sl.className='slot'; sl.style.borderLeft=''; }
+  });
+  updateBadge('pre'); updateBadge('show');
+}
+
+// ── EXPORT ──
+function getFilledSlots(times, prefix) {
+  return times.map(time=>{
+    const id=`${prefix}-${time.replace(':','')}`;
+    return {
+      time,
+      type: document.getElementById(`type-${id}`)?.value||'',
+      note: document.getElementById(`note-${id}`)?.value?.trim()||'',
+      crew: document.getElementById(`crew-${id}`)?.value?.trim()||'',
+    };
+  }).filter(s=>s.type||s.note||s.crew);
+}
+
+function buildExportSection(title, slots) {
+  if(!slots.length) return `<div class="export-section"><div class="export-section-title">${title}</div><p style="padding:14px 20px;font-size:12px;color:#999">Nessuna attività.</p></div>`;
+  const rows = slots.map(s=>{
+    const tObj = getTypeObj(s.type);
+    const color = tObj?.color || '#888';
+    const label = tObj?.label || s.type || '';
+    return `
+      <div class="export-row">
+        <div class="export-time">${s.time}</div>
+        <div class="export-type" style="color:${color}">${label.toUpperCase()}</div>
+        <div class="export-note">${s.note||''}</div>
+        <div class="export-crew-col">${s.crew||''}</div>
+      </div>`;
+  }).join('');
+  return `<div class="export-section"><div class="export-section-title">${title}</div>${rows}</div>`;
+}
+
+function formatDate(val) {
+  if(!val) return '—';
+  const [y,m,d]=val.split('-');
+  return `${d} ${['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'][parseInt(m)-1]} ${y}`;
+}
+
+function showExport() {
+  const evento=document.getElementById('m-evento').value||'—';
+  const data=document.getElementById('m-data').value;
+  const location=document.getElementById('m-location').value||'—';
+
+  document.getElementById('ex-title').textContent=evento;
+  document.getElementById('ex-meta').innerHTML=`
+    <div class="export-meta-item"><span class="export-meta-label">Data</span><span class="export-meta-value">${formatDate(data)}</span></div>
+    <div class="export-meta-item"><span class="export-meta-label">Location</span><span class="export-meta-value">${location}</span></div>`;
+
+  const crew = getCrewData();
+  if(crew.length) {
+    document.getElementById('ex-crew').innerHTML=`
+      <div class="export-crew-title">◼ CREW TECNICA</div>
+      <table class="export-crew-table">
+        <thead><tr><th>Nome</th><th>Ruolo</th><th>Telefono</th><th>Email</th></tr></thead>
+        <tbody>${crew.map(r=>`<tr><td>${r.nome}</td><td>${r.ruolo}</td><td>${r.tel}</td><td>${r.email}</td></tr>`).join('')}</tbody>
+      </table>`;
+  } else {
+    document.getElementById('ex-crew').innerHTML='';
+  }
+
+  const preSlots=getFilledSlots(getPreTimes(),'pre');
+  const showSlots=getFilledSlots(getShowTimes(),'show');
+  document.getElementById('ex-body').innerHTML=buildExportSection('◼ PRE SHOW',preSlots)+buildExportSection('◼ SHOW',showSlots);
+
+  // footer: solo crew tecnica (nessuna data generazione)
+  const crewDT = crew.find(c => c.ruolo?.toLowerCase().includes('tecn')) || crew[0];
+  document.getElementById('ex-footer-dt').textContent = crewDT ? `DT: ${crewDT.nome}` : '';
+
+  document.getElementById('export-overlay').style.display='block';
+}
+
+function closeExport() { document.getElementById('export-overlay').style.display='none'; }
+
+function getInlineStyles() {
+  // Raccoglie gli stili inline senza dipendere da about:blank
+  return document.querySelector('style').textContent;
+}
+
+function printExport() {
+  const sheetHTML = document.getElementById('export-sheet').outerHTML;
+  const css = getInlineStyles();
+  const fontLink = `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">`;
+  const printCSS = `<style>body{margin:0;font-family:'Inter',sans-serif;background:#fff;color:#1A1A2E}${css}@media print{body{margin:0}.export-actions{display:none}}</style>`;
+
+  const blob = new Blob([`<!doctype html><html><head><meta charset="utf-8">${fontLink}${printCSS}</head><body>${sheetHTML}<script>window.onload=function(){window.print()}<\/script></body></html>`], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (!win) {
+    // fallback se popup bloccato
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.click();
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+function copyText() {
+  const evento=document.getElementById('m-evento').value||'—';
+  const data=document.getElementById('m-data').value;
+  const location=document.getElementById('m-location').value||'—';
+  let txt=`PdP — ${evento}\n${formatDate(data)} | ${location}\n\n`;
+
+  const crew=getCrewData();
+  if(crew.length){
+    txt+='▌ CREW TECNICA\n';
+    crew.forEach(r=>{txt+=`${r.nome}  ${r.ruolo}  ${r.tel}  ${r.email}\n`;});
+    txt+='\n';
+  }
+
+  const pre=getFilledSlots(getPreTimes(),'pre');
+  const show=getFilledSlots(getShowTimes(),'show');
+  if(pre.length){
+    txt+='▌ PRE SHOW\n';
+    pre.forEach(s=>{
+      const label = getTypeObj(s.type)?.label||'';
+      txt+=`${s.time}  ${label}${s.note?'  '+s.note:''}${s.crew?'  ['+s.crew+']':''}\n`;
+    });
+    txt+='\n';
+  }
+  if(show.length){
+    txt+='▌ SHOW\n';
+    show.forEach(s=>{
+      const label = getTypeObj(s.type)?.label||'';
+      txt+=`${s.time}  ${label}${s.note?'  '+s.note:''}${s.crew?'  ['+s.crew+']':''}\n`;
+    });
+  }
+
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.querySelectorAll('.export-actions .btn-teal')[0];
+    const orig=btn.textContent; btn.textContent='✓ Copiato!';
+    setTimeout(()=>btn.textContent=orig,2000);
+  }).catch(()=>alert(txt));
+}
+
+['m-evento','m-data','m-location'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',saveState);
+});
+
+// ── INIT ──
+loadCustomTypes();
+buildLegend();
+buildSlots('slots-pre', getPreTimes(), 'pre');
+buildSlots('slots-show', getShowTimes(), 'show');
+loadState();
+</script>
